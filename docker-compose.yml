@@ -1,0 +1,42 @@
+version: "3"
+services:
+  app:
+    container_name: containerize_app_1
+    image: ad-hoc-app
+    depends_on:
+      - nginx
+    ports:
+      - 8000
+    volumes:
+      - ./app/src:/app
+    entrypoint:
+      - flask
+      - run
+      - --host=10.5.0.10
+      - --port=8000
+    environment:
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
+      FLASK_APP: ./server.py
+    networks:
+      agent:
+        ipv4_address: 10.5.0.10
+  nginx:
+    container_name: containerize_app_2
+    image: ad-hoc-nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/files:/etc/nginx/ssl
+    networks:
+      agent:
+        ipv4_address: 10.5.0.11
+networks:
+  agent:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/24
+
+
